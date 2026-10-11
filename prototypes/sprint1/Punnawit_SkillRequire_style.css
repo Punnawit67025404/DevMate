@@ -1,0 +1,506 @@
+/* นำเข้าฟอนต์ภาษาไทย (ตัวอย่างใช้ Noto Sans Thai หรือคล้ายคลึง) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
+
+/* --- ตัวแปรสี (Color Variables) --- */
+:root {
+    --primary-blue: #0b4bcc;
+    --primary-hover: #083799;
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-main: #333333;
+    --text-muted: #666666;
+    --text-light: #999999;
+    --border-color: #e5e7eb;
+    --tag-blue-bg: #e6efff;
+    --tag-blue-text: #0b4bcc;
+    --tag-gray-bg: #f3f4f6;
+    --tag-gray-text: #4b5563;
+}
+
+/* --- Base Styles --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans Thai', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* --- Typography & Utilities --- */
+h2 {
+    font-size: 16px;
+    font-weight: 700;
+}
+h3 {
+    font-size: 16px;
+    font-weight: 600;
+}
+h4 {
+    font-size: 14px;
+    font-weight: 600;
+}
+.text-blue {
+    color: var(--primary-blue);
+}
+.mt-10 { margin-top: 10px; }
+.mt-20 { margin-top: 20px; }
+
+/* --- Buttons --- */
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+}
+
+.primary-btn {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: 0.2s;
+}
+.primary-btn:hover { background-color: var(--primary-hover); }
+
+.outline-btn {
+    background-color: white;
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.2s;
+}
+.outline-btn:hover { background-color: var(--tag-blue-bg); }
+
+.full-width { width: 100%; }
+
+/* --- Navbar --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    height: 60px;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.nav-links {
+    display: flex;
+    gap: 24px;
+    height: 100%;
+}
+
+.nav-links a {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.nav-links a.active {
+    color: var(--primary-blue);
+}
+
+.nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--primary-blue);
+    border-radius: 3px 3px 0 0;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.icon-btn {
+    font-size: 20px;
+    color: var(--text-muted);
+}
+
+.profile-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* --- Main Layout --- */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    display: flex;
+    gap: 24px;
+    padding: 0 20px;
+    align-items: flex-start;
+}
+
+/* --- Left Sidebar (Filters) --- */
+.sidebar-left {
+    flex: 0 0 250px;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.clear-btn {
+    color: var(--primary-blue);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.search-input-box {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.search-input-box input {
+    width: 100%;
+    padding: 8px 30px 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: 12px;
+}
+
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.active-tag {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.remove-tag {
+    color: white;
+    margin-left: 6px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.dropdown-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-main);
+    background-color: white;
+    outline: none;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkbox-group label {
+    font-weight: 400;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+/* --- Middle Column (Search Results) --- */
+.main-results {
+    flex: 1;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.sort-options {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-btn {
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.user-card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
+}
+
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.user-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.role {
+    font-size: 13px;
+    color: var(--text-main);
+    margin: 2px 0 4px;
+}
+
+.education {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.match-score {
+    text-align: right;
+}
+
+.match-score strong {
+    display: block;
+    font-size: 18px;
+}
+
+.match-score span {
+    font-size: 12px;
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.skills-list .tag {
+    background-color: var(--tag-blue-bg);
+    color: var(--tag-blue-text);
+}
+
+.skills-list .tag.light-gray {
+    background-color: var(--tag-gray-bg);
+    color: var(--tag-gray-text);
+}
+
+.card-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+}
+
+.bookmark-btn {
+    font-size: 18px;
+}
+
+/* --- Right Sidebar (Compatibility & Recommend) --- */
+.sidebar-right {
+    flex: 0 0 280px;
+}
+
+.panel {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
+}
+
+.panel h3 {
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+/* Donut Chart (CSS) */
+.circular-progress {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    /* ใช้ Conic Gradient เพื่อสร้างหลอดเป้าหมายวงกลม (92%) */
+    background: conic-gradient(var(--primary-blue) 0% 92%, var(--border-color) 92% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.inner-circle {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background-color: var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.compatibility-desc {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.skills-comparison h4 {
+    font-size: 13px;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.recommend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.recommend-item:last-child { margin-bottom: 0; }
+
+.small-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.recommend-info h4 {
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.recommend-info p {
+    font-size: 12px;
+}
+
+/* --- Footer --- */
+.site-footer {
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 40px;
+}
+
+.footer-left strong {
+    color: var(--text-main);
+    margin-right: 8px;
+}
+
+.footer-right {
+    display: flex;
+    gap: 16px;
+}
+
+.footer-right a:hover {
+    color: var(--primary-blue);
+}
+
+/* --- Responsive (เบื้องต้นสำหรับจอเล็ก) --- */
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+    }
+    .sidebar-left, .sidebar-right {
+        width: 100%;
+        flex: none;
+    }
+}

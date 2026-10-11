@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CollabHub - My Team</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet" href="Sirapat_Myteam_style.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+
+        <div class="logo">
+            CollabHub
+        </div>
+
+        <nav class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">Find Partners <span>(ค้นหาคู่)</span></a>
+            <a href="#" class="active">My Team <span>(งานของฉัน)</span></a>
+        </nav>
+
+        <div class="nav-right">
+
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="ค้นหาโปรเจกต์ หรือเพื่อน...">
+            </div>
+
+            <div class="nav-icon notification">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notification-dot"></span>
+            </div>
+
+            <div class="nav-icon">
+                <i class="fa-regular fa-envelope"></i>
+            </div>
+
+            <div class="profile">
+                <img src="https://i.pravatar.cc/100?img=12" alt="Profile">
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar card">
+
+            <h1>Study Companion</h1>
+
+            <p class="subtitle">
+                เวิร์กสเปซบริหารกลุ่มผู้ร่วมงาน 3 คน
+            </p>
+
+            <div class="menu">
+
+                <div class="menu-item active-menu">
+                    <i class="fa-regular fa-message"></i>
+                    <span>ห้องแชต & ภาพรวม</span>
+                </div>
+
+                <div class="menu-item">
+                    <i class="fa-regular fa-square-check"></i>
+                    <span>แผนงานย่อย (3)</span>
+                </div>
+
+                <div class="menu-item">
+                    <i class="fa-regular fa-folder"></i>
+                    <span>คลังไฟล์แบ่งปัน (3)</span>
+                </div>
+
+                <div class="menu-item">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span>ปฏิทินงานกลุ่ม</span>
+                </div>
+
+                <div class="menu-item">
+                    <i class="fa-regular fa-bookmark"></i>
+                    <span>มอร์ดันท์ Wiki</span>
+                </div>
+
+            </div>
+
+
+            <!-- Meeting Box -->
+            <div class="meeting-box">
+
+                <div class="meeting-label">
+                    การประชุมถัดไป
+                </div>
+
+                <h3>
+                    อัปเดตความคืบหน้าระบบ
+                </h3>
+
+                <p>
+                    พรุ่งนี้ เวลา 17:00 น.
+                </p>
+
+                <button class="meeting-btn">
+                    <i class="fa-solid fa-video"></i>
+                    เข้าประชุมทีม
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- CHAT AREA -->
+        <section class="chat card">
+
+            <div class="chat-header">
+
+                <h2>
+                    กลุ่มคุยแชตของลูกทีม
+                </h2>
+
+                <span>
+                    2 ข้อความที่ยังไม่อ่าน
+                </span>
+
+            </div>
+
+
+            <div class="chat-content">
+
+                <!-- Message 1 -->
+                <div class="message-row">
+
+                    <img class="avatar"
+                         src="https://i.pravatar.cc/100?img=11"
+                         alt="User">
+
+                    <div class="message-wrapper">
+
+                        <div class="message-info">
+                            <strong>สมชาย</strong>
+                            <span>10:30</span>
+                        </div>
+
+                        <div class="message received">
+
+                            อัปเดตหน้า Login แล้วครับ เดี๋ยวผมแนบไฟล์ให้ดู
+
+                            <div class="file-card">
+
+                                <div class="file-icon">
+                                    <i class="fa-regular fa-file-lines"></i>
+                                </div>
+
+                                <div class="file-info">
+                                    <strong>login-screen.png</strong>
+                                </div>
+
+                                <span class="file-size">
+                                    1.2 MB
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Message 2 -->
+                <div class="message-row message-right">
+
+                    <div class="message-wrapper">
+
+                        <div class="message-info right">
+                            <strong>คุณ</strong>
+                            <span>10:32</span>
+                        </div>
+
+                        <div class="message sent">
+                            สวยเลยครับ เดี๋ยวผมเตรียม API ให้
+                        </div>
+
+                    </div>
+
+                    <img class="avatar"
+                         src="https://i.pravatar.cc/100?img=47"
+                         alt="You">
+
+                </div>
+
+            </div>
+
+
+            <!-- Chat Input -->
+            <div class="chat-input-area">
+
+                <button class="attachment-btn">
+                    <i class="fa-solid fa-paperclip"></i>
+                </button>
+
+                <input
+                    type="text"
+                    placeholder="พิมพ์ข้อความที่ต้องการส่ง..."
+                >
+
+                <button class="send-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT SIDEBAR -->
+        <aside class="right-sidebar">
+
+            <!-- Tasks -->
+            <div class="card tasks-card">
+
+                <div class="card-title">
+
+                    <h2>
+                        งานเร่งด่วนสัปดาห์นี้
+                    </h2>
+
+                    <a href="#">
+                        ดูทั้งหมด
+                    </a>
+
+                </div>
+
+
+                <div class="task-list">
+
+                    <div class="task-item">
+
+                        <div>
+                            <h3>ออกแบบ UI หน้า Home</h3>
+                            <p>ผู้รับผิดชอบ: คุณ</p>
+                        </div>
+
+                        <span class="status completed">
+                            เสร็จสิ้น
+                        </span>
+
+                    </div>
+
+
+                    <div class="task-item">
+
+                        <div>
+                            <h3>พัฒนา API ระบบ Login</h3>
+                            <p>ผู้รับผิดชอบ: สมชาย</p>
+                        </div>
+
+                        <span class="status progress">
+                            กำลังดำเนินการ
+                        </span>
+
+                    </div>
+
+
+                    <div class="task-item">
+
+                        <div>
+                            <h3>เชื่อมต่อฐานข้อมูลผู้ใช้</h3>
+                            <p>ผู้รับผิดชอบ: รอดำเนินการ</p>
+                        </div>
+
+                        <span class="status waiting">
+                            รอดำเนินการ
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Looking For -->
+            <div class="card looking-card">
+
+                <h2>
+                    ต้องการรับสมัครผู้ช่วย
+                </h2>
+
+
+                <div class="job-item">
+
+                    <h3>
+                        Backend Developer
+                    </h3>
+
+                    <p>
+                        ต้องการ 1 อัตรา
+                    </p>
+
+                </div>
+
+
+                <div class="job-item">
+
+                    <h3>
+                        UI/UX Designer
+                    </h3>
+
+                    <p>
+                        ต้องการ 1 อัตรา
+                    </p>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </main>
+
+</body>
+</html>

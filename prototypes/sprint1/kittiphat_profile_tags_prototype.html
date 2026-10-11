@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โปรไฟล์นิสิต - Prototype</title>
+<link rel="stylesheet" href="kittiphat_profile_tags_style.css">
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- LEFT: Profile card -->
+    <aside class="profile-card">
+      <span class="status-badge">พร้อมร่วมทีม</span>
+
+      <div class="avatar-wrap">
+        <div class="avatar">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"></path>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="profile-name">Kittiphat Student</h1>
+      <p class="profile-handle">@kittiphat_dev</p>
+
+      <div class="info-list">
+        <p class="info-row">📍 กรุงเทพมหานคร, ประเทศไทย</p>
+        <p class="info-row">🎓 นิสิตปี 3 คณะวิศวกรรมศาสตร์<br>มหาวิทยาลัยพะเยา</p>
+        <p class="info-row">🕒 เวลาว่างสะดวก<br>จันทร์ - ศุกร์ หลัง 17:00 น.</p>
+      </div>
+
+      <button id="edit-btn" class="edit-btn">✎ แก้ไขโปรไฟล์</button>
+    </aside>
+
+    <!-- RIGHT: Main content -->
+    <main class="main-col">
+
+      <section class="panel">
+        <h2 class="panel-title">คำขอชวนเข้าร่วมทีมด่วน (<span id="invite-count">2</span>)</h2>
+        <ul id="invite-list" class="invite-list">
+          <li class="invite-item" data-id="1">
+            <div>
+              <p class="invite-project">Smart Budget Planner</p>
+              <p class="invite-role">ชวนเข้าร่วมในตำแหน่ง: Backend Developer</p>
+            </div>
+            <div class="invite-actions">
+              <button class="accept-btn">✓ ตอบรับ</button>
+              <button class="decline-btn">✕</button>
+            </div>
+          </li>
+          <li class="invite-item" data-id="2">
+            <div>
+              <p class="invite-project">Campus Event Platform</p>
+              <p class="invite-role">ชวนเข้าร่วมในตำแหน่ง: UI/UX Designer</p>
+            </div>
+            <div class="invite-actions">
+              <button class="accept-btn">✓ ตอบรับ</button>
+              <button class="decline-btn">✕</button>
+            </div>
+          </li>
+        </ul>
+        <p id="invite-empty" class="empty-hint" style="display:none;">ยังไม่มีคำขอเข้าร่วมทีมตอนนี้</p>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">ข้อมูลเกี่ยวกับฉัน</h2>
+        <p class="about-text">มีความสนใจในการพัฒนา Web Application และ UX/UI Design ชอบทำงานเป็นทีม เรียนรู้เร็ว และแก้ปัญหาได้ดี ปัจจุบันกำลังมองหาโปรเจกต์ท้าทายเพื่อพัฒนาฝีมือในด้าน Full-stack Development</p>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">🏅 ทักษะและความชำนาญ</h2>
+
+        <div class="add-row">
+          <input type="text" id="skill-input" placeholder="พิมพ์ชื่อทักษะ เช่น Next.js, Supabase...">
+          <select id="level-input">
+            <option value="20">เริ่มต้น (1/5)</option>
+            <option value="40">พอใช้ (2/5)</option>
+            <option value="60" selected>ปานกลาง (3/5)</option>
+            <option value="80">ดี (4/5)</option>
+            <option value="100">ชำนาญ (5/5)</option>
+          </select>
+          <button id="add-btn">+</button>
+        </div>
+        <p id="form-error" class="error-text"></p>
+
+        <ul id="skill-list" class="skill-list"></ul>
+        <p id="empty-hint" class="empty-hint">ยังไม่มีทักษะ ลองเพิ่มด้านบน</p>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Interactive logic for skill tag + proficiency management prototype
+    // (Generated in the style of a ChatGPT "Five S's" prompt response)
+
+    const skillInput = document.getElementById("skill-input");
+    const levelInput = document.getElementById("level-input");
+    const addBtn = document.getElementById("add-btn");
+    const skillList = document.getElementById("skill-list");
+    const emptyHint = document.getElementById("empty-hint");
+    const formError = document.getElementById("form-error");
+
+    let skills = [
+      { name: "Frontend (React, Next.js)", percent: 80 },
+      { name: "Git / GitHub", percent: 80 }
+    ];
+
+    function renderSkills() {
+      skillList.innerHTML = "";
+      emptyHint.style.display = skills.length === 0 ? "block" : "none";
+
+      skills.forEach((skill, index) => {
+        const li = document.createElement("li");
+        li.className = "skill-item";
+
+        li.innerHTML = `
+          <div class="skill-top">
+            <span class="skill-name">${skill.name}</span>
+            <span class="skill-percent">${skill.percent}%</span>
+            <button class="delete-btn" data-index="${index}" aria-label="ลบ ${skill.name}">🗑</button>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: ${skill.percent}%;"></div>
+          </div>
+        `;
+
+        skillList.appendChild(li);
+      });
+
+      document.querySelectorAll(".delete-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const idx = Number(e.currentTarget.dataset.index);
+          skills.splice(idx, 1);
+          renderSkills();
+        });
+      });
+    }
+
+    addBtn.addEventListener("click", () => {
+      const name = skillInput.value.trim();
+      const percent = Number(levelInput.value);
+
+      formError.textContent = "";
+
+      if (name === "") {
+        formError.textContent = "กรุณากรอกชื่อทักษะ";
+        return;
+      }
+
+      const isDuplicate = skills.some(
+        (s) => s.name.toLowerCase() === name.toLowerCase()
+      );
+
+      if (isDuplicate) {
+        formError.textContent = "ทักษะนี้ถูกเพิ่มไปแล้ว";
+        return;
+      }
+
+      skills.push({ name, percent });
+      skillInput.value = "";
+      levelInput.value = "60";
+      skillInput.focus();
+      renderSkills();
+    });
+
+    skillInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addBtn.click();
+      }
+    });
+
+    renderSkills();
+
+    // Invite requests: accept / decline just remove the card (prototype only)
+    document.querySelectorAll(".accept-btn, .decline-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const item = e.currentTarget.closest(".invite-item");
+        item.remove();
+        const remaining = document.querySelectorAll(".invite-item").length;
+        document.getElementById("invite-count").textContent = remaining;
+        document.getElementById("invite-empty").style.display = remaining === 0 ? "block" : "none";
+      });
+    });
+
+    // Edit profile: stub for prototype
+    document.getElementById("edit-btn").addEventListener("click", () => {
+      alert("ฟังก์ชันแก้ไขโปรไฟล์ยังไม่พร้อมใช้งานใน Prototype นี้");
+    });
+  </script>
+</body>
+</html>

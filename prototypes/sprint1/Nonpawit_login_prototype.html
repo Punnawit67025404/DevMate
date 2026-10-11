@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ลงทะเบียนนิสิต - ระบบจับคู่เฉพาะภายในมหาวิทยาลัย</title>
+  <link rel="stylesheet" href="Nonpawit_login_style.css" />
+</head>
+<body>
+ 
+  <div class="page">
+    <div class="card">
+ 
+      <div class="header">
+        <div class="icon-circle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <h1>ระบบจับคู่เฉพาะภายในมหาวิทยาลัย</h1>
+        <p class="subtitle">ลงทะเบียนด้วยอีเมลนิสิตเพื่อเข้าใช้งาน</p>
+      </div>
+ 
+      <form id="signup-form" novalidate>
+ 
+        <div class="field">
+          <label for="email">อีเมลนิสิต</label>
+          <div class="input-wrap">
+            <input type="text" id="email" name="email" placeholder="6xxxxxxxx@university.ac.th" autocomplete="email" />
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+          </div>
+          <p class="hint" id="email-hint">รองรับเฉพาะโดเมนอีเมลของมหาวิทยาลัยเท่านั้น</p>
+        </div>
+ 
+        <div class="field">
+          <label for="student-id">รหัสนิสิต</label>
+          <input type="text" id="student-id" name="studentId" placeholder="เช่น 6512345678" autocomplete="off" />
+        </div>
+ 
+        <div class="field">
+          <label for="password">รหัสผ่าน</label>
+          <input type="password" id="password" name="password" placeholder="อย่างน้อย 8 ตัวอักษร" autocomplete="new-password" />
+        </div>
+ 
+        <div class="field">
+          <label for="confirm-password">ยืนยันรหัสผ่าน</label>
+          <input type="password" id="confirm-password" name="confirmPassword" placeholder="กรอกรหัสผ่านอีกครั้ง" autocomplete="new-password" />
+          <p class="error" id="confirm-error"></p>
+        </div>
+ 
+        <div class="checkbox-row">
+          <input type="checkbox" id="otp" name="otp" checked disabled />
+          <label for="otp">ระบบจะส่งรหัส OTP ไปยังอีเมลนิสิตเพื่อยืนยันตัวตนก่อนเข้าใช้งาน</label>
+        </div>
+ 
+        <button type="submit" id="submit-btn">ลงทะเบียนและส่งรหัสยืนยัน</button>
+ 
+        <p class="signin-link">มีบัญชีอยู่แล้ว? <a href="#">เข้าสู่ระบบ</a></p>
+      </form>
+ 
+    </div>
+ 
+    <div class="footer-note">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      <span>ข้อมูลของคุณถูกใช้เพื่อยืนยันสถานะนิสิตเท่านั้น</span>
+    </div>
+  </div>
+ 
+  <!-- ตัวอย่างหน้ายืนยัน OTP (ซ่อนไว้ก่อน) -->
+  <div class="modal-overlay" id="otp-modal">
+    <div class="modal">
+      <h2>ยืนยันอีเมลของคุณ</h2>
+      <p class="modal-text">กรอกรหัส OTP 6 หลักที่ส่งไปยัง <span id="otp-email">-</span></p>
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" class="otp-box" />
+        <input type="text" maxlength="1" class="otp-box" />
+        <input type="text" maxlength="1" class="otp-box" />
+        <input type="text" maxlength="1" class="otp-box" />
+        <input type="text" maxlength="1" class="otp-box" />
+        <input type="text" maxlength="1" class="otp-box" />
+      </div>
+      <button type="button" id="verify-btn">ยืนยัน</button>
+      <p class="resend">ไม่ได้รับรหัส? <a href="#" id="resend-link">ส่งอีกครั้ง</a></p>
+      <button type="button" class="close-modal" id="close-modal">ปิด</button>
+    </div>
+  </div>
+ 
+  <script>
+    // ตั้งค่าโดเมนอีเมลของมหาวิทยาลัยที่อนุญาต
+    const ALLOWED_DOMAIN = "@university.ac.th";
+ 
+    const form = document.getElementById("signup-form");
+    const emailInput = document.getElementById("email");
+    const emailHint = document.getElementById("email-hint");
+    const studentIdInput = document.getElementById("student-id");
+    const passwordInput = document.getElementById("password");
+    const confirmInput = document.getElementById("confirm-password");
+    const confirmError = document.getElementById("confirm-error");
+    const submitBtn = document.getElementById("submit-btn");
+ 
+    const otpModal = document.getElementById("otp-modal");
+    const otpEmailLabel = document.getElementById("otp-email");
+    const otpBoxes = document.querySelectorAll(".otp-box");
+    const verifyBtn = document.getElementById("verify-btn");
+    const closeModalBtn = document.getElementById("close-modal");
+    const resendLink = document.getElementById("resend-link");
+ 
+    // ตรวจสอบว่าอีเมลใช้โดเมนของมหาวิทยาลัยหรือไม่
+    function isValidUniversityEmail(value) {
+      return value.trim().toLowerCase().endsWith(ALLOWED_DOMAIN);
+    }
+ 
+    emailInput.addEventListener("blur", () => {
+      const value = emailInput.value.trim();
+      if (value.length === 0) {
+        emailHint.textContent = "รองรับเฉพาะโดเมนอีเมลของมหาวิทยาลัยเท่านั้น";
+        emailHint.classList.remove("invalid");
+        return;
+      }
+      if (!isValidUniversityEmail(value)) {
+        emailHint.textContent = `กรุณาใช้อีเมลนิสิตที่ลงท้ายด้วย ${ALLOWED_DOMAIN}`;
+        emailHint.classList.add("invalid");
+      } else {
+        emailHint.textContent = "รองรับเฉพาะโดเมนอีเมลของมหาวิทยาลัยเท่านั้น";
+        emailHint.classList.remove("invalid");
+      }
+    });
+ 
+    confirmInput.addEventListener("input", () => {
+      if (confirmInput.value.length === 0) {
+        confirmError.textContent = "";
+        return;
+      }
+      confirmError.textContent =
+        confirmInput.value === passwordInput.value ? "" : "รหัสผ่านไม่ตรงกัน";
+    });
+ 
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+ 
+      const email = emailInput.value.trim();
+      const studentId = studentIdInput.value.trim();
+      const password = passwordInput.value;
+      const confirmPassword = confirmInput.value;
+ 
+      if (!isValidUniversityEmail(email)) {
+        emailHint.textContent = `กรุณาใช้อีเมลนิสิตที่ลงท้ายด้วย ${ALLOWED_DOMAIN}`;
+        emailHint.classList.add("invalid");
+        emailInput.focus();
+        return;
+      }
+ 
+      if (studentId.length === 0) {
+        studentIdInput.focus();
+        return;
+      }
+ 
+      if (password.length < 8) {
+        passwordInput.focus();
+        return;
+      }
+ 
+      if (password !== confirmPassword) {
+        confirmError.textContent = "รหัสผ่านไม่ตรงกัน";
+        confirmInput.focus();
+        return;
+      }
+ 
+      // จำลองการส่ง OTP ไปยังอีเมล แล้วเปิด modal ยืนยัน
+      otpEmailLabel.textContent = email;
+      openOtpModal();
+    });
+ 
+    function openOtpModal() {
+      otpModal.classList.add("open");
+      otpBoxes.forEach((box) => (box.value = ""));
+      otpBoxes[0].focus();
+    }
+ 
+    function closeOtpModal() {
+      otpModal.classList.remove("open");
+    }
+ 
+    // เลื่อนโฟกัสไปช่องถัดไปเมื่อกรอกรหัส OTP ทีละหลัก
+    otpBoxes.forEach((box, index) => {
+      box.addEventListener("input", () => {
+        box.value = box.value.replace(/[^0-9]/g, "").slice(0, 1);
+        if (box.value && index < otpBoxes.length - 1) {
+          otpBoxes[index + 1].focus();
+        }
+      });
+ 
+      box.addEventListener("keydown", (event) => {
+        if (event.key === "Backspace" && !box.value && index > 0) {
+          otpBoxes[index - 1].focus();
+        }
+      });
+    });
+ 
+    verifyBtn.addEventListener("click", () => {
+      const code = Array.from(otpBoxes)
+        .map((box) => box.value)
+        .join("");
+ 
+      if (code.length < 6) {
+        otpBoxes.forEach((box) => {
+          if (!box.value) box.focus();
+        });
+        return;
+      }
+ 
+      // ในระบบจริง: เรียก API เพื่อตรวจสอบรหัส OTP กับฝั่งเซิร์ฟเวอร์
+      alert("ยืนยันตัวตนสำเร็จ! บัญชีของคุณพร้อมใช้งานระบบจับคู่แล้ว");
+      closeOtpModal();
+      form.reset();
+    });
+ 
+    resendLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      // ในระบบจริง: เรียก API เพื่อส่งรหัส OTP ใหม่
+      alert("ส่งรหัส OTP ใหม่แล้ว กรุณาตรวจสอบอีเมลของคุณ");
+    });
+ 
+    closeModalBtn.addEventListener("click", closeOtpModal);
+  </script>
+</body>
+</html>

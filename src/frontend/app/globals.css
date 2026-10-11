@@ -1,0 +1,45 @@
+/* ================================================================
+   globals.css — DevMate Frontend
+   Tailwind CSS v4 + Google Font Inter + Base Styles
+   (ดีไซน์ดั้งเดิมของทีม — ใช้ Tailwind utilities ล้วน ไม่มี CSS เขียนมือชนกัน)
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+/* layout ใส่ class font-sans ที่ <body> จึงต้องกำหนดฟอนต์ผ่าน theme ไม่เช่นนั้นจะตกไปใช้ฟอนต์ระบบ */
+@theme {
+  --font-sans: 'Inter', 'Noto Sans Thai', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', 'Noto Sans Thai', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-slate-50 text-slate-900;
+  }
+  input, select, textarea {
+    @apply outline-none;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:focus-visible {
+    @apply outline-2 outline-offset-2 outline-blue-500;
+  }
+}
+
+/* line-clamp-2 / line-clamp-3 มีใน Tailwind v4 อยู่แล้ว จึงไม่ต้องประกาศซ้ำ */
+
+/* animation ที่หน้า create / project detail เรียกใช้ (animate-fadeIn) */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.15s ease-out forwards;
+}

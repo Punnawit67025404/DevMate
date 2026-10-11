@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CollabHub - Find Projects</title>
+    <!-- ลิงก์ไปยังไฟล์ CSS ที่จะสร้างในขั้นตอนต่อไป -->
+    <link rel="stylesheet" href="Punnawit_SkillRequire_style.css">
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header class="navbar">
+        <div class="logo">CollabHub</div>
+        <nav class="nav-links">
+            <a href="#">Home</a>
+            <a href="#" class="active">Find Projects</a>
+            <a href="#">My Team</a>
+            <a href="#">Messages</a>
+        </nav>
+        <div class="nav-actions">
+            <button class="icon-btn notification-btn" aria-label="Notifications">🔔</button>
+            <button class="icon-btn message-btn" aria-label="Messages">✉️</button>
+            <img src="https://via.placeholder.com/40" alt="User Avatar" class="profile-avatar">
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container">
+        
+        <!-- Left Sidebar: Filters -->
+        <aside class="sidebar-left">
+            <div class="filter-header">
+                <h2>ตัวกรอง</h2>
+                <button id="clear-filters-btn" class="clear-btn">ล้างตัวกรอง</button>
+            </div>
+
+            <!-- Filter: Skills -->
+            <div class="filter-group">
+                <label>ทักษะ:</label>
+                <div class="search-input-box">
+                    <input type="text" placeholder="เลือกทักษะ...">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="selected-tags" id="skill-tags">
+                    <span class="tag active-tag">Backend (Node.js) <button class="remove-tag">×</button></span>
+                    <span class="tag active-tag">Database <button class="remove-tag">×</button></span>
+                </div>
+            </div>
+
+            <!-- Filter: Faculty -->
+            <div class="filter-group">
+                <label>คณะ:</label>
+                <select class="dropdown-select">
+                    <option value="">เลือกคณะ...</option>
+                </select>
+            </div>
+
+            <!-- Filter: Year -->
+            <div class="filter-group">
+                <label>ชั้นปี</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="year" value="1"> ปี 1</label>
+                    <label><input type="checkbox" name="year" value="2"> ปี 2</label>
+                    <label><input type="checkbox" name="year" value="3" checked> ปี 3</label>
+                    <label><input type="checkbox" name="year" value="4"> ปี 4</label>
+                    <label><input type="checkbox" name="year" value="5+"> ปี 5 ขึ้นไป</label>
+                </div>
+            </div>
+
+            <!-- Filter: Status -->
+            <div class="filter-group">
+                <label>สถานะ:</label>
+                <select class="dropdown-select">
+                    <option value="ready">พร้อมเข้าทีม</option>
+                </select>
+            </div>
+
+            <button class="primary-btn full-width mt-10">ใช้ตัวกรอง</button>
+        </aside>
+
+        <!-- Middle Column: Search Results -->
+        <section class="main-results">
+            <div class="results-header">
+                <h2>ผลการค้นหา 24 คน</h2>
+                <div class="sort-options">
+                    <span>(เรียงตาม: ความเข้ากันได้)</span>
+                    <button class="sort-btn">ความเข้ากันได้ ˅</button>
+                </div>
+            </div>
+
+            <div class="cards-container">
+                <!-- Card 1 -->
+                <article class="user-card">
+                    <div class="card-header">
+                        <img src="https://via.placeholder.com/60" alt="วริศรา ใจงาม" class="user-img">
+                        <div class="user-info">
+                            <h3>วริศรา ใจงาม</h3>
+                            <p class="role">Backend Developer</p>
+                            <p class="education">🎓 ปี 3 คณะวิศวกรรมศาสตร์ • มหาวิทยาลัยตัวอย่าง</p>
+                        </div>
+                        <div class="match-score text-blue">
+                            <strong>92%</strong>
+                            <span>Match</span>
+                        </div>
+                    </div>
+                    <div class="skills-list">
+                        <span class="tag">Node.js</span>
+                        <span class="tag">Express</span>
+                        <span class="tag">MongoDB</span>
+                        <span class="tag">SQL</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="primary-btn">เชิญเข้าทีม</button>
+                        <button class="icon-btn bookmark-btn">🔖</button>
+                    </div>
+                </article>
+
+                <!-- Card 2 -->
+                <article class="user-card">
+                    <div class="card-header">
+                        <img src="https://via.placeholder.com/60" alt="ธีรภัทร์ ขยันเรียน" class="user-img">
+                        <div class="user-info">
+                            <h3>ธีรภัทร์ ขยันเรียน</h3>
+                            <p class="role">Backend Developer</p>
+                            <p class="education">🎓 ปี 2 คณะวิทยาการคอมพิวเตอร์ • มหาวิทยาลัยตัวอย่าง</p>
+                        </div>
+                        <div class="match-score text-blue">
+                            <strong>89%</strong>
+                            <span>Match</span>
+                        </div>
+                    </div>
+                    <div class="skills-list">
+                        <span class="tag">Python</span>
+                        <span class="tag">Django</span>
+                        <span class="tag">PostgreSQL</span>
+                        <span class="tag">API</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="primary-btn">เชิญเข้าทีม</button>
+                        <button class="icon-btn bookmark-btn">🔖</button>
+                    </div>
+                </article>
+
+                <!-- Card 3 -->
+                <article class="user-card">
+                    <div class="card-header">
+                        <img src="https://via.placeholder.com/60" alt="นิศาชล ตั้งใจจริง" class="user-img">
+                        <div class="user-info">
+                            <h3>นิศาชล ตั้งใจจริง</h3>
+                            <p class="role">Full Stack Developer</p>
+                            <p class="education">🎓 ปี 3 คณะวิศวกรรมคอมพิวเตอร์ • มหาวิทยาลัยตัวอย่าง</p>
+                        </div>
+                        <div class="match-score text-blue">
+                            <strong>85%</strong>
+                            <span>Match</span>
+                        </div>
+                    </div>
+                    <div class="skills-list">
+                        <span class="tag">Node.js</span>
+                        <span class="tag">React</span>
+                        <span class="tag">MongoDB</span>
+                        <span class="tag">Tailwind</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="primary-btn">เชิญเข้าทีม</button>
+                        <button class="icon-btn bookmark-btn">🔖</button>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Right Sidebar: Compatibility & Recommendations -->
+        <aside class="sidebar-right">
+            
+            <!-- Compatibility Panel -->
+            <div class="panel compatibility-panel">
+                <h3>ความเข้ากันได้ของคุณ</h3>
+                
+                <div class="circular-progress">
+                    <div class="inner-circle">92%</div>
+                </div>
+                
+                <p class="compatibility-desc">คุณและคนนี้มีทักษะที่สอดคล้องกันสูง</p>
+                
+                <div class="skills-comparison">
+                    <div class="match-group">
+                        <h4>ทักษะที่ตรงกัน</h4>
+                        <div class="skills-list">
+                            <span class="tag light-blue">Node.js</span>
+                            <span class="tag light-blue">Express</span>
+                            <span class="tag light-blue">MongoDB</span>
+                        </div>
+                    </div>
+                    
+                    <div class="match-group mt-10">
+                        <h4>ทักษะที่แตกต่าง</h4>
+                        <div class="skills-list">
+                            <span class="tag light-gray">Socket.io</span>
+                            <span class="tag light-gray">Redis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="outline-btn full-width mt-10">ดูโปรไฟล์เต็ม</button>
+            </div>
+
+            <!-- Recommendations Panel -->
+            <div class="panel recommendations-panel mt-20">
+                <h3>แนะนำสำหรับคุณ</h3>
+                
+                <div class="recommend-item">
+                    <img src="https://via.placeholder.com/40" alt="ยศพล มาดี" class="small-avatar">
+                    <div class="recommend-info">
+                        <h4>ยศพล มาดี</h4>
+                        <p class="text-blue">88% Match</p>
+                    </div>
+                </div>
+
+                <div class="recommend-item">
+                    <img src="https://via.placeholder.com/40" alt="สุดารัตน์ ใจดี" class="small-avatar">
+                    <div class="recommend-info">
+                        <h4>สุดารัตน์ ใจดี</h4>
+                        <p class="text-blue">86% Match</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-left">
+            <strong>CollabHub</strong>
+            <span>© 2024 CollabHub Platform. Structured Collaboration for Professionals.</span>
+        </div>
+        <div class="footer-right">
+            <a href="#">About</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Help Center</a>
+            <a href="#">Terms of Service</a>
+        </div>
+    </footer>
+
+    <!-- JavaScript (Java) พื้นฐานสำหรับจัดการ Interaction ในหน้าเว็บ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. ระบบปุ่มล้างตัวกรอง (Clear Filters)
+            const clearBtn = document.getElementById('clear-filters-btn');
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][name="year"]');
+            const skillTagsContainer = document.getElementById('skill-tags');
+
+            clearBtn.addEventListener('click', () => {
+                // ล้าง Checkbox ทั้งหมด
+                checkboxes.forEach(cb => cb.checked = false);
+                // ล้าง Tag ในช่องทักษะ
+                skillTagsContainer.innerHTML = '';
+            });
+
+            // 2. ระบบลบ Tag ทักษะรายตัว (กากบาท)
+            document.addEventListener('click', (e) => {
+                if(e.target.classList.contains('remove-tag')) {
+                    e.target.parentElement.remove();
+                }
+            });
+
+            // 3. ปุ่ม Bookmark (สลับสถานะ)
+            const bookmarkBtns = document.querySelectorAll('.bookmark-btn');
+            bookmarkBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.classList.toggle('bookmarked');
+                    // เปลี่ยนสีเพื่อทดสอบการทำงานเบื้องต้น
+                    if(this.classList.contains('bookmarked')) {
+                        this.style.color = '#0056b3';
+                    } else {
+                        this.style.color = 'inherit';
+                    }
+                });
+            });
+
+            // 4. ปุ่มเชิญเข้าทีม (จำลอง Event)
+            const inviteBtns = document.querySelectorAll('.primary-btn');
+            inviteBtns.forEach(btn => {
+                if(btn.innerText === 'เชิญเข้าทีม') {
+                    btn.addEventListener('click', () => {
+                        alert('ส่งคำเชิญเข้าร่วมทีมเรียบร้อยแล้ว!');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
