@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // หน้าที่ต้องล็อกอินก่อนเข้า (รวมหน้าย่อยด้านล่าง)
-const PROTECTED_PATHS = ["/profile", "/myteam", "/matching", "/projects/create"];
+const PROTECTED_PATHS = ["/profile", "/myteam", "/matching", "/projects/create", "/members"];
 
 // Next.js 15: refresh Supabase auth cookies for server and browser.
 export async function updateSession(request: NextRequest) {

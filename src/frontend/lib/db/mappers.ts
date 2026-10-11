@@ -13,6 +13,17 @@ import type {
 // ชื่อที่แสดงเมื่อโปรไฟล์ยังไม่ได้ตั้งชื่อ
 export const UNNAMED = "ไม่ระบุชื่อ";
 
+// bucket รูปโปรไฟล์ใน Supabase Storage
+export const AVATAR_BUCKET = "avatars";
+
+// profiles.avatar_url เก็บ path ใน bucket (เช่น "<user_id>/avatar-123.jpg") -> URL สาธารณะ
+// ว่าง/ไม่มีค่า = ไม่มีรูป (แสดงตัวย่อชื่อแทน)
+export function avatarUrlOf(path: string | null | undefined): string | undefined {
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!path || !base) return undefined;
+  return `${base.replace(/\/$/, "")}/storage/v1/object/public/${AVATAR_BUCKET}/${path}`;
+}
+
 // ตัวย่อชื่อสำหรับวงกลมอวาตาร์: ชื่อมีหลายคำใช้ตัวแรกของ 2 คำแรก ไม่งั้นใช้ 2 ตัวแรก
 export function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -42,6 +53,7 @@ export function toUiUser(
     year: row.year,
     bio: row.bio,
     avatar: initialsOf(row.display_name),
+    avatarUrl: avatarUrlOf(row.avatar_url),
     skills: toSkills(row.skills),
     githubUrl: links.githubUrl ?? "",
     behanceUrl: links.behanceUrl ?? "",

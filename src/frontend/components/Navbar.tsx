@@ -10,7 +10,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getSupabase } from "../lib/supabase";
 import { getCurrentUser, type CurrentUser } from "../lib/db/auth";
-import { initialsOf } from "../lib/db/mappers";
+import { Avatar } from "./Avatar";
+
+// หน้าโปรไฟล์ส่งเหตุการณ์นี้เมื่อแก้ชื่อ/รูป เพื่อให้ Navbar โหลดข้อมูลผู้ใช้ใหม่ทันที (ไม่ต้องรีเฟรชหน้า)
+export const PROFILE_UPDATED_EVENT = "devmate:profile-updated";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -52,9 +55,12 @@ export function Navbar() {
       setTimeout(load, 0);
     });
 
+    window.addEventListener(PROFILE_UPDATED_EVENT, load);
+
     return () => {
       live = false;
       subscription.unsubscribe();
+      window.removeEventListener(PROFILE_UPDATED_EVENT, load);
     };
   }, []);
 
@@ -124,9 +130,11 @@ export function Navbar() {
                 href="/profile"
                 className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 hover:bg-slate-100 transition"
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
-                  {initialsOf(currentUser.displayName)}
-                </div>
+                <Avatar
+                  name={currentUser.displayName}
+                  url={currentUser.avatarUrl}
+                  className="h-7 w-7 rounded-full bg-blue-600 text-xs font-bold text-white"
+                />
                 <span className="text-xs font-medium text-slate-700 max-w-[120px] truncate">
                   {currentUser.displayName}
                 </span>

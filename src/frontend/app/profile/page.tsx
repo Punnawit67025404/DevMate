@@ -6,14 +6,17 @@
 // ข้อมูลทั้งหมดอ่าน/เขียนจาก Supabase: ข้อมูลนิสิต, ทักษะ (20-100%), ลิงก์ GitHub/Behance
 // ==============================================================================
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SKILL_OPTIONS } from "../../lib/skills";
 import { FACULTY_SUGGESTIONS, YEAR_OPTIONS } from "../../lib/options";
 import { fetchMyProfile, saveProfile, saveSkills, savePortfolioLinks } from "../../lib/db/profiles";
-import { initialsOf, UNNAMED } from "../../lib/db/mappers";
+import { avatarUrlOf, UNNAMED } from "../../lib/db/mappers";
+import { removeAvatar, uploadAvatar } from "../../lib/db/avatars";
 import { fetchMyInvites, respondToInvite } from "../../lib/db/invitations";
 import { Skill, TeamInvite } from "../../types";
 import { SkillBadge } from "../../components/profile/SkillBadge";
+import { Avatar } from "../../components/Avatar";
+import { PROFILE_UPDATED_EVENT } from "../../components/Navbar";
 
 const URL_RE = /^https?:\/\/\S+$/i;
 
@@ -29,6 +32,11 @@ export default function ProfilePage() {
   const [bio, setBio] = useState("");
   const [infoError, setInfoError] = useState("");
   const [savingInfo, setSavingInfo] = useState(false);
+
+  // รูปโปรไฟล์
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
 
   // รายการทักษะ
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -78,6 +86,7 @@ export default function ProfilePage() {
         setFaculty(me.faculty);
         setYear(me.year);
         setBio(me.bio);
+        setAvatarUrl(me.avatarUrl);
         setSkills(me.skills);
         setGithubUrl(me.githubUrl ?? "");
         setBehanceUrl(me.behanceUrl ?? "");
@@ -93,9 +102,12 @@ export default function ProfilePage() {
     };
   }, []);
 
+  // ยกเลิกตัวนับเวลาของข้อความก่อนหน้าเสมอ ไม่งั้นการทำหลายอย่างติดกันจะถูกตัวนับเก่าลบข้อความใหม่ก่อนเวลา
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const flash = (message: string) => {
+    clearTimeout(flashTimer.current);
     setSuccessMessage(message);
-    setTimeout(() => setSuccessMessage(""), 3000);
+    flashTimer.current = setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   // 0. บันทึกข้อมูลนิสิต (ชื่อ คณะ ชั้นปี bio)
@@ -104,11 +116,47 @@ export default function ProfilePage() {
     setSavingInfo(true);
     try {
       await saveProfile({ displayName, faculty, year, bio });
+      window.dispatchEvent(new Event(PROFILE_UPDATED_EVENT));
       flash("บันทึกข้อมูลนิสิตเรียบร้อยแล้ว");
     } catch (err) {
       setInfoError(err instanceof Error ? err.message : "บันทึกข้อมูลไม่สำเร็จ");
     } finally {
       setSavingInfo(false);
+    }
+  };
+
+  // อัปโหลด/เปลี่ยนรูปโปรไฟล์ (ย่อรูปในเบราว์เซอร์ก่อนส่ง)
+  const handleAvatarSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // ให้เลือกไฟล์เดิมซ้ำได้
+    if (!file) return;
+
+    setAvatarError("");
+    setAvatarBusy(true);
+    try {
+      const path = await uploadAvatar(file);
+      setAvatarUrl(avatarUrlOf(path));
+      window.dispatchEvent(new Event(PROFILE_UPDATED_EVENT));
+      flash("เปลี่ยนรูปโปรไฟล์เรียบร้อยแล้ว");
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : "อัปโหลดรูปไม่สำเร็จ");
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setAvatarError("");
+    setAvatarBusy(true);
+    try {
+      await removeAvatar();
+      setAvatarUrl(undefined);
+      window.dispatchEvent(new Event(PROFILE_UPDATED_EVENT));
+      flash("ลบรูปโปรไฟล์แล้ว");
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : "ลบรูปไม่สำเร็จ");
+    } finally {
+      setAvatarBusy(false);
     }
   };
 
@@ -258,15 +306,53 @@ export default function ProfilePage() {
             </h2>
 
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-xl font-black text-white shadow-md">
-                {initialsOf(displayName || email)}
-              </div>
+              <Avatar
+                name={displayName || email}
+                url={avatarUrl}
+                className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-xl font-black text-white shadow-md"
+                zoomable
+              />
               <div className="min-w-0">
                 <h3 className="font-bold text-slate-900 text-base truncate">
                   {displayName || UNNAMED}
                 </h3>
                 <p className="text-xs text-slate-500 truncate">{email}</p>
               </div>
+            </div>
+
+            {/* อัปโหลด/เปลี่ยน/ลบรูปโปรไฟล์ */}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <label
+                  className={`inline-flex cursor-pointer items-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition ${
+                    avatarBusy ? "pointer-events-none opacity-60" : ""
+                  }`}
+                >
+                  {avatarBusy ? "กำลังดำเนินการ..." : avatarUrl ? "เปลี่ยนรูป" : "อัปโหลดรูป"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleAvatarSelected}
+                    disabled={avatarBusy}
+                    aria-label="เลือกไฟล์รูปโปรไฟล์"
+                    className="hidden"
+                  />
+                </label>
+                {avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    disabled={avatarBusy}
+                    className="rounded-xl px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-50 transition disabled:opacity-60"
+                  >
+                    ลบรูป
+                  </button>
+                )}
+              </div>
+              {avatarError && <p className="text-xs text-red-500 font-medium">⚠️ {avatarError}</p>}
+              <p className="text-[11px] text-slate-400">
+                รองรับ JPG, PNG, WebP (ระบบตัดเป็นสี่เหลี่ยมจัตุรัสและย่อให้อัตโนมัติ) รูปและข้อมูลโปรไฟล์ผู้ใช้ที่ล็อกอินทุกคนมองเห็นได้
+              </p>
             </div>
 
             <div>

@@ -6,9 +6,9 @@
 // (หน้าที่เรียกใช้ควรส่ง key={projectId} เพื่อให้รีเซ็ตเมื่อเปลี่ยนโปรเจกต์)
 // ==============================================================================
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TeamTask } from "../../types";
-import { createTask, fetchTasks, updateTaskStatus } from "../../lib/db/tasks";
+import { createTask, fetchTasks, subscribeTasks, toUiTask, updateTaskStatus } from "../../lib/db/tasks";
 
 interface TaskSectionProps {
   projectId: string;
@@ -42,11 +42,37 @@ export function TaskSection({ projectId, members }: TaskSectionProps) {
 
   const names = Object.fromEntries(members.map((m) => [m.id, m.name]));
 
+  // เก็บรายชื่อล่าสุดไว้ให้ callback ของ realtime ใช้ โดยไม่ต้องโหลดงานใหม่ทุกครั้งที่สมาชิกเปลี่ยน
+  const namesRef = useRef(names);
+  useEffect(() => {
+    namesRef.current = names;
+  });
+
+  // เพิ่มงานใหม่ หรือแทนที่งานเดิม (กันซ้ำด้วย id เพราะงานที่เราเพิ่มเองก็จะวิ่งกลับมาทาง realtime)
+  const upsertTask = (task: TeamTask) =>
+    setTasks((prev) => (prev.some((t) => t.id === task.id) ? prev.map((t) => (t.id === task.id ? task : t)) : [task, ...prev]));
+
   useEffect(() => {
     let live = true;
-    fetchTasks(projectId, Object.fromEntries(members.map((m) => [m.id, m.name])))
+    let unsubscribe = () => {};
+
+    try {
+      // เริ่มฟังก่อนโหลด เพื่อไม่ให้พลาดงานที่เปลี่ยนระหว่างโหลด
+      unsubscribe = subscribeTasks(projectId, (row) => {
+        if (live) upsertTask(toUiTask(row, namesRef.current));
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "เชื่อมต่อการอัปเดตงานสดไม่สำเร็จ");
+    }
+
+    fetchTasks(projectId, namesRef.current)
       .then((rows) => {
-        if (live) setTasks(rows);
+        if (!live) return;
+        // รวมกับงานที่เข้ามาทาง realtime ระหว่างโหลด (ใช้ข้อมูลจาก DB เป็นหลัก)
+        setTasks((prev) => {
+          const ids = new Set(rows.map((r) => r.id));
+          return [...rows, ...prev.filter((t) => !ids.has(t.id))];
+        });
       })
       .catch((err: unknown) => {
         if (live) setError(err instanceof Error ? err.message : "โหลดงานไม่สำเร็จ");
@@ -54,10 +80,13 @@ export function TaskSection({ projectId, members }: TaskSectionProps) {
       .finally(() => {
         if (live) setLoading(false);
       });
+
     return () => {
       live = false;
+      unsubscribe();
     };
-  }, [projectId, members]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
 
   // ป้ายแสดงสถานะพร้อมสีตามเงื่อนไข
   const renderStatusBadge = (status: TeamTask["status"]) => {
@@ -115,7 +144,7 @@ export function TaskSection({ projectId, members }: TaskSectionProps) {
         },
         names
       );
-      setTasks((prev) => [created, ...prev]);
+      upsertTask(created);
       setNewTitle("");
       setNewDueDate("");
     } catch (err) {
@@ -219,7 +248,10 @@ export function TaskSection({ projectId, members }: TaskSectionProps) {
 
             <div className="flex items-center justify-between gap-2 text-[11px] text-slate-500 pt-1">
               <span className="truncate">
-                👤 <strong className="text-slate-700">{task.assignee}</strong>
+                👤{" "}
+                <strong className="text-slate-700">
+                  {task.assigneeId ? names[task.assigneeId] || task.assignee : task.assignee}
+                </strong>
               </span>
               <span className="shrink-0">
                 ⚑ {PRIORITY_LABEL[task.priority]} · 📅 {task.dueDate}

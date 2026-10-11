@@ -12,6 +12,35 @@ import { toUiUser } from "./mappers";
 export const PORTFOLIO_GITHUB = "GitHub";
 export const PORTFOLIO_BEHANCE = "Behance";
 
+function linksOf(items: { title: string; url: string }[]) {
+  return {
+    githubUrl: items.find((i) => i.title === PORTFOLIO_GITHUB)?.url,
+    behanceUrl: items.find((i) => i.title === PORTFOLIO_BEHANCE)?.url,
+  };
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// โปรไฟล์ของสมาชิกคนอื่น (ผู้ล็อกอินอ่านได้ตาม RLS) ไม่พบ/id ไม่ถูกต้อง = null
+// ไม่คืนอีเมล (อยู่ใน auth.users ที่อ่านไม่ได้) และไม่ใช้คอลัมน์ portfolio_url ที่ไม่มีตัวตรวจรูปแบบ
+export async function fetchMemberProfile(id: string): Promise<User | null> {
+  if (!UUID_RE.test(id)) return null;
+  const sb = requireSupabase();
+
+  const [profileRes, portfolioRes] = await Promise.all([
+    sb.from("profiles").select("*").eq("id", id).maybeSingle(),
+    sb.from("portfolio_items").select("title, url").eq("user_id", id),
+  ]);
+  if (profileRes.error) throw new Error(profileRes.error.message);
+  if (!profileRes.data) return null;
+
+  return toUiUser(
+    profileRes.data as DbProfile,
+    "",
+    linksOf((portfolioRes.data ?? []) as { title: string; url: string }[])
+  );
+}
+
 // คืน null ถ้ายังไม่ล็อกอิน
 export async function fetchMyProfile(): Promise<User | null> {
   const sb = requireSupabase();
@@ -26,11 +55,7 @@ export async function fetchMyProfile(): Promise<User | null> {
   ]);
   if (profileRes.error) throw new Error(profileRes.error.message);
 
-  const items = (portfolioRes.data ?? []) as { title: string; url: string }[];
-  const links = {
-    githubUrl: items.find((i) => i.title === PORTFOLIO_GITHUB)?.url,
-    behanceUrl: items.find((i) => i.title === PORTFOLIO_BEHANCE)?.url,
-  };
+  const links = linksOf((portfolioRes.data ?? []) as { title: string; url: string }[]);
 
   // บัญชีที่ยังไม่มีแถว profiles: สร้างค่าว่างจากข้อมูล auth เพื่อให้หน้าใช้งานต่อได้
   const profile: DbProfile = (profileRes.data as DbProfile | null) ?? {

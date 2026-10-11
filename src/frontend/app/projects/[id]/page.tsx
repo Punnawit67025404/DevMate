@@ -174,7 +174,15 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         </h1>
 
         <div className="flex flex-wrap gap-4 text-xs text-slate-600 border-t border-slate-100 pt-3">
-          <span>👑 เจ้าของโปรเจกต์: <strong className="text-slate-900">{project.ownerName}</strong></span>
+          <span>👑 เจ้าของโปรเจกต์: <strong className="text-slate-900">
+              {project.ownerId ? (
+                <Link href={`/members/${project.ownerId}`} className="hover:text-blue-600 hover:underline transition">
+                  {project.ownerName}
+                </Link>
+              ) : (
+                project.ownerName
+              )}
+            </strong></span>
           <span>⏱ ระยะเวลา: <strong className="text-slate-900">{project.duration}</strong></span>
           <span>👥 จำนวนสมาชิก: <strong className="text-blue-600">{project.currentMembers}/{project.maxMembers} คน</strong></span>
         </div>

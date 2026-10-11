@@ -6,7 +6,7 @@
 
 import { requireSupabase } from "../supabase";
 import { requireUserId } from "./auth";
-import { initialsOf, toSkills, toUiApplication, UNNAMED } from "./mappers";
+import { avatarUrlOf, initialsOf, toSkills, toUiApplication, UNNAMED } from "./mappers";
 import type { Application as UiApplication } from "../../types";
 import type { Application as DbApplication } from "../types";
 
@@ -24,6 +24,7 @@ export type TeamMember = {
   name: string;
   role: string; // ข้อความที่แสดง เช่น "เจ้าของโปรเจกต์", "สมาชิกทีม", หรือตำแหน่งจากคำเชิญ
   avatar: string;
+  avatarUrl?: string;
   skills: string[];
   isOwner: boolean;
 };
@@ -65,12 +66,12 @@ export async function fetchTeamMembers(projectId: string): Promise<TeamMember[]>
 
   const { data: profiles, error: profileError } = await sb
     .from("profiles")
-    .select("id, display_name, skills")
+    .select("id, display_name, skills, avatar_url")
     .in("id", rows.map((r) => r.user_id));
   if (profileError) throw new Error(profileError.message);
 
-  const byId = new Map<string, { display_name: string; skills: unknown }>(
-    (profiles ?? []).map((p: { id: string; display_name: string; skills: unknown }) => [p.id, p])
+  const byId = new Map<string, { display_name: string; skills: unknown; avatar_url?: string }>(
+    (profiles ?? []).map((p: { id: string; display_name: string; skills: unknown; avatar_url?: string }) => [p.id, p])
   );
 
   return rows
@@ -82,11 +83,32 @@ export async function fetchTeamMembers(projectId: string): Promise<TeamMember[]>
         name,
         role: ROLE_LABEL[r.role] ?? r.role,
         avatar: initialsOf(name),
+        avatarUrl: avatarUrlOf(profile?.avatar_url),
         skills: toSkills(profile?.skills).map((s) => s.name),
         isOwner: r.role === "owner",
       };
     })
     .sort((a, b) => Number(b.isOwner) - Number(a.isOwner));
+}
+
+// ฟังการเปลี่ยนแปลงที่กระทบสมาชิก/นัดหมายของทีมแบบ realtime: ใบสมัคร, คำเชิญ, นัดหมาย
+// RLS ส่งเหตุการณ์ให้เฉพาะคนที่อ่านแถวนั้นได้ (ใบสมัคร = เจ้าของและผู้สมัคร) คืนฟังก์ชันเลิกติดตาม
+export function subscribeTeamChanges(projectId: string, onChange: () => void): () => void {
+  const sb = requireSupabase();
+  let channel = sb.channel(`team-changes-${projectId}`);
+
+  for (const table of ["applications", "invitations", "team_events"]) {
+    channel = channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table, filter: `project_id=eq.${projectId}` },
+      () => onChange()
+    );
+  }
+  channel.subscribe();
+
+  return () => {
+    void sb.removeChannel(channel);
+  };
 }
 
 // ตำแหน่งที่ยังขาด = ทักษะที่โปรเจกต์ต้องการแต่ยังไม่มีสมาชิกคนไหนมี + จำนวนที่นั่งว่าง
@@ -115,13 +137,16 @@ export async function fetchPendingApplications(projectId: string): Promise<UiApp
 
   const { data: profiles } = await sb
     .from("profiles")
-    .select("id, display_name")
+    .select("id, display_name, avatar_url")
     .in("id", [...new Set(rows.map((r) => r.applicant_id))]);
-  const names = new Map<string, string>(
-    (profiles ?? []).map((p: { id: string; display_name: string }) => [p.id, p.display_name])
+  const byId = new Map<string, { display_name: string; avatar_url?: string }>(
+    (profiles ?? []).map((p: { id: string; display_name: string; avatar_url?: string }) => [p.id, p])
   );
 
-  return rows.map((r) => toUiApplication(r, names.get(r.applicant_id) || UNNAMED));
+  return rows.map((r) => ({
+    ...toUiApplication(r, byId.get(r.applicant_id)?.display_name || UNNAMED),
+    applicantAvatarUrl: avatarUrlOf(byId.get(r.applicant_id)?.avatar_url),
+  }));
 }
 
 // อนุมัติ/ปฏิเสธใบสมัครที่ยังรอพิจารณา (เจ้าของเท่านั้น)

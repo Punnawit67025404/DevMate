@@ -277,7 +277,15 @@ export default function ProjectsPage() {
                 {/* Footer ของการ์ด */}
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-xs text-slate-400">
-                    สร้างโดย: <strong className="text-slate-600">{project.ownerName}</strong>
+                    สร้างโดย: <strong className="text-slate-600">
+                      {project.ownerId ? (
+                        <Link href={`/members/${project.ownerId}`} className="hover:text-blue-600 hover:underline transition">
+                          {project.ownerName}
+                        </Link>
+                      ) : (
+                        project.ownerName
+                      )}
+                    </strong>
                   </span>
 
                   <Link

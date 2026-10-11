@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Avatar } from "../components/Avatar";
 import { fetchProjects } from "../lib/db/projects";
 import { fetchMembers } from "../lib/db/members";
 import { fetchPublicStats, type PublicStats } from "../lib/db/stats";
@@ -323,11 +324,18 @@ export default function HomePage() {
               key={candidate.id}
               className="rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm hover:shadow-md transition space-y-3"
             >
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-indigo-50 border border-indigo-200 text-indigo-600 font-extrabold text-base">
-                {candidate.avatar}
-              </div>
+              <Avatar
+                name={candidate.name}
+                url={candidate.avatarUrl}
+                className="mx-auto h-14 w-14 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-600 font-extrabold text-base"
+                zoomable
+              />
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">{candidate.name}</h4>
+                <h4 className="font-bold text-slate-900 text-sm">
+                  <Link href={`/members/${candidate.id}`} className="hover:text-blue-600 hover:underline transition">
+                    {candidate.name}
+                  </Link>
+                </h4>
                 <p className="text-[11px] text-slate-500 truncate">{candidate.faculty}</p>
               </div>
               <div className="flex flex-wrap justify-center gap-1">

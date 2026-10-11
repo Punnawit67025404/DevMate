@@ -20,6 +20,7 @@ export interface User {
   year: number; // ชั้นปี 1-4
   bio: string; // แนะนำตัวสั้นๆ
   avatar?: string;
+  avatarUrl?: string; // URL รูปโปรไฟล์ (ไม่มี = ใช้ตัวย่อชื่อใน avatar)
   skills: Skill[]; // รายการทักษะที่มี
   githubUrl?: string; // ลิงก์ GitHub
   behanceUrl?: string; // ลิงก์ Behance/Portfolio
@@ -65,6 +66,7 @@ export interface Application {
   projectId: string;
   applicantId: string;
   applicantName: string;
+  applicantAvatarUrl?: string; // รูปผู้สมัคร (ถ้ามี) ใช้ในหน้า My Team ของเจ้าของ
   message: string;
   portfolioLink: string;
   status: "pending" | "accepted" | "rejected";

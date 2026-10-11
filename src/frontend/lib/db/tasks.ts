@@ -7,7 +7,7 @@ import { requireSupabase } from "../supabase";
 import { formatThaiDate } from "./mappers";
 import type { TeamTask } from "../../types";
 
-type DbTask = {
+export type DbTask = {
   id: string;
   title: string;
   status: string;
@@ -28,7 +28,7 @@ const TO_DB: Record<TeamTask["status"], string> = {
   completed: "done",
 };
 
-function toUiTask(row: DbTask, names: Record<string, string>): TeamTask {
+export function toUiTask(row: DbTask, names: Record<string, string>): TeamTask {
   return {
     id: row.id,
     title: row.title,
@@ -79,6 +79,26 @@ export async function createTask(
     .single();
   if (error) throw new Error(error.message);
   return toUiTask(data as DbTask, names);
+}
+
+// รับงานที่ถูกเพิ่ม/แก้ไขโดยสมาชิกคนอื่นแบบ realtime (RLS ส่งให้เฉพาะสมาชิกทีม) คืนฟังก์ชันเลิกติดตาม
+export function subscribeTasks(projectId: string, onChange: (task: DbTask) => void): () => void {
+  const sb = requireSupabase();
+  const channel = sb
+    .channel(`team-tasks-${projectId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${projectId}` },
+      (payload) => {
+        if (payload.eventType === "DELETE") return;
+        onChange(payload.new as DbTask);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    void sb.removeChannel(channel);
+  };
 }
 
 export async function updateTaskStatus(taskId: string, status: TeamTask["status"]): Promise<void> {

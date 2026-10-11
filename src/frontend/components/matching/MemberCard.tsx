@@ -5,7 +5,9 @@
 // การ์ดแสดงข้อมูลผู้สมัคร / สมาชิก พร้อมวงกลมเปอร์เซ็นต์ Match Score
 // ==============================================================================
 
+import Link from "next/link";
 import { User } from "../../types";
+import { Avatar } from "../Avatar";
 
 interface MemberCardProps {
   member: User;
@@ -51,11 +53,18 @@ export function MemberCard({
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             {/* Avatar รูปหรือชื่อย่อ */}
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-sm">
-              {member.avatar || member.name.slice(0, 2)}
-            </div>
+            <Avatar
+              name={member.name}
+              url={member.avatarUrl}
+              className="h-12 w-12 rounded-full bg-blue-600 text-sm font-bold text-white shadow-sm"
+              zoomable
+            />
             <div>
-              <h3 className="font-bold text-slate-900 text-base">{member.name}</h3>
+              <h3 className="font-bold text-slate-900 text-base">
+                <Link href={`/members/${member.id}`} className="hover:text-blue-600 hover:underline transition">
+                  {member.name}
+                </Link>
+              </h3>
               <p className="text-xs text-slate-500">
                 {member.faculty} · ชั้นปี {member.year}
               </p>
@@ -149,7 +158,10 @@ export function MemberCard({
       {/* ปุ่มกดเชิญเข้าทีม / สถานะ */}
       <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
         <span className="text-xs text-slate-400">
-          {member.skills.length} ทักษะรวม
+          {member.skills.length} ทักษะรวม ·{" "}
+          <Link href={`/members/${member.id}`} className="font-bold text-blue-600 hover:underline">
+            ดูโปรไฟล์
+          </Link>
         </span>
 
         <button

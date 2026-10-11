@@ -26,6 +26,7 @@ export type Profile = {
   skills: { name: string; level: number }[];
   availability: string;
   portfolio_url: string;
+  avatar_url?: string; // path ใน bucket avatars (ว่าง = ไม่มีรูป)
 };
 
 export type Application = {

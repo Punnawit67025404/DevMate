@@ -11,12 +11,14 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChatSection } from "../../components/myteam/ChatSection";
 import { TaskSection } from "../../components/myteam/TaskSection";
+import { Avatar } from "../../components/Avatar";
 import { getCurrentUserId } from "../../lib/db/auth";
 import {
   fetchMyTeams,
   fetchTeamMembers,
   fetchPendingApplications,
   reviewApplication,
+  subscribeTeamChanges,
   computeOpenRoles,
   type TeamProject,
   type TeamMember,
@@ -79,19 +81,21 @@ export default function MyTeamPage() {
     };
   }, []);
 
-  const loadTeam = useCallback(async (id: string, owner: boolean) => {
-    setTeamError("");
+  // silent = รีเฟรชเบื้องหลัง (realtime/ตั้งเวลา) ไม่แสดง error รบกวนถ้าล้มเหลวชั่วคราว
+  const loadTeam = useCallback(async (id: string, owner: boolean, silent = false) => {
+    if (!silent) setTeamError("");
     try {
       const [teamMembers, event, applications] = await Promise.all([
         fetchTeamMembers(id),
         fetchNextEvent(id),
         owner ? fetchPendingApplications(id) : Promise.resolve([] as Application[]),
       ]);
-      setMembers(teamMembers);
-      setNextEvent(event);
-      setPending(applications);
+      // ถ้าข้อมูลเหมือนเดิมให้คง reference เดิมไว้ ไม่ให้ส่วนอื่นของหน้า render/โหลดซ้ำโดยไม่จำเป็น
+      setMembers((prev) => (JSON.stringify(prev) === JSON.stringify(teamMembers) ? prev : teamMembers));
+      setNextEvent((prev) => (JSON.stringify(prev) === JSON.stringify(event) ? prev : event));
+      setPending((prev) => (JSON.stringify(prev) === JSON.stringify(applications) ? prev : applications));
     } catch (err) {
-      setTeamError(err instanceof Error ? err.message : "โหลดข้อมูลทีมไม่สำเร็จ");
+      if (!silent) setTeamError(err instanceof Error ? err.message : "โหลดข้อมูลทีมไม่สำเร็จ");
     } finally {
       setTeamLoading(false);
     }
@@ -101,6 +105,36 @@ export default function MyTeamPage() {
     if (!projectId) return;
     void loadTeam(projectId, isOwner);
   }, [projectId, isOwner, loadTeam]);
+
+  // อัปเดตสดโดยไม่ต้องรีเฟรชหน้า: ใบสมัครใหม่/ที่ถูกพิจารณา, ผู้ตอบรับคำเชิญ, นัดหมายใหม่
+  useEffect(() => {
+    if (!projectId || !meId) return;
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // รวมเหตุการณ์ที่มาติดๆ กันให้เหลือการโหลดครั้งเดียว
+    const refresh = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => void loadTeam(projectId, isOwner, true), 300);
+    };
+
+    let unsubscribe = () => {};
+    try {
+      unsubscribe = subscribeTeamChanges(projectId, refresh);
+    } catch {
+      // ต่อ realtime ไม่ได้: ยังมีการดึงข้อมูลสำรองด้านล่าง
+    }
+
+    // สำรอง: สมาชิกที่ไม่ใช่เจ้าของไม่ได้รับเหตุการณ์ใบสมัครของคนอื่น (RLS) จึงดึงใหม่เป็นระยะขณะเปิดหน้าอยู่
+    const poll = setInterval(() => {
+      if (document.visibilityState === "visible") void loadTeam(projectId, isOwner, true);
+    }, 30000);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(poll);
+      unsubscribe();
+    };
+  }, [projectId, meId, isOwner, loadTeam]);
 
   const handleSwitchProject = (id: string) => {
     setTeamLoading(true);
@@ -372,12 +406,17 @@ export default function MyTeamPage() {
             <div className="space-y-3">
               {members.map((m) => (
                 <div key={m.id} className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-bold text-xs shadow-xs">
-                    {m.avatar}
-                  </div>
+                  <Avatar
+                    name={m.name}
+                    url={m.avatarUrl}
+                    className="h-9 w-9 rounded-full bg-blue-100 text-blue-700 font-bold text-xs shadow-xs"
+                    zoomable
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-slate-800 truncate">
-                      {m.name}
+                      <Link href={`/members/${m.id}`} className="hover:text-blue-600 hover:underline transition">
+                        {m.name}
+                      </Link>
                       {m.id === meId ? " (ฉัน)" : ""}
                     </p>
                     <p className="text-[11px] text-slate-500">{m.role}</p>
@@ -406,11 +445,26 @@ export default function MyTeamPage() {
                 <div className="space-y-3">
                   {pending.map((app) => (
                     <div key={app.id} className="rounded-xl border border-slate-200 bg-white p-3 space-y-2 text-xs">
-                      <div className="flex items-start justify-between gap-2">
-                        <strong className="text-slate-900">{app.applicantName}</strong>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Avatar
+                            name={app.applicantName}
+                            url={app.applicantAvatarUrl}
+                            className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 font-bold text-[11px]"
+                            zoomable
+                          />
+                          <strong className="text-slate-900 truncate">
+                            <Link href={`/members/${app.applicantId}`} className="hover:text-blue-600 hover:underline transition">
+                              {app.applicantName}
+                            </Link>
+                          </strong>
+                        </div>
                         <span className="text-[10px] text-slate-400 shrink-0">{app.appliedAt}</span>
                       </div>
                       <p className="text-slate-600 whitespace-pre-wrap break-words">{app.message}</p>
+                      <Link href={`/members/${app.applicantId}`} className="inline-block text-[11px] font-bold text-blue-600 hover:underline">
+                        ดูโปรไฟล์ผู้สมัคร (ทักษะ/ผลงาน) →
+                      </Link>
                       {app.portfolioLink && (
                         <a
                           href={app.portfolioLink}
